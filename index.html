@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ortak Bazlı Yükselteç Simülatörü</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <main class="app-shell">
+    <header class="page-header">
+      <p class="eyebrow">PROJE 9 · WEB TABANLI SİMÜLATÖR</p>
+      <h1>Ortak Bazlı Yükselteç</h1>
+      <p class="subtitle">
+        DC çalışma noktası ve alçak frekans AC analizini canlı inceleyin.
+      </p>
+    </header>
+
+    <!-- BLOK 1 -->
+    <section class="block">
+      <h2>
+        <span class="num">1</span>
+        Ortak Bazlı Yükselteç Devresi — Kullanıcı Tarafından Değiştirilebilir Parametreler
+      </h2>
+
+      <div class="row">
+        <div class="col circuit-col">
+          <svg
+            id="svgMain"
+            viewBox="0 0 560 380"
+            aria-label="Ana devre şeması"
+          ></svg>
+
+          <p class="note">
+            C1: giriş kuplaj kapasitörü (emiter girişi) ·
+            C2: çıkış kuplaj kapasitörü (kolektör çıkışı) ·
+            Baz AC/DC toprağa bağlıdır.
+          </p>
+        </div>
+
+        <div class="col controls-col">
+          <div class="controls-head">
+            <span>PARAMETRE KONTROLÜ</span>
+            <span class="live-dot">CANLI</span>
+          </div>
+
+          <div class="sliders" id="sliders"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BLOK 2 -->
+    <section class="block">
+      <h2>
+        <span class="num">2</span>
+        DC Eş Değer Devre — Çalışma Noktası ve Bölge
+      </h2>
+
+      <div class="row">
+        <div class="col circuit-col">
+          <svg
+            id="svgDC"
+            viewBox="0 0 560 340"
+            aria-label="DC eş değer devre şeması"
+          ></svg>
+        </div>
+
+        <div class="col">
+          <div class="resgrid" id="dcResults"></div>
+
+          <div id="regionBox" class="region">—</div>
+
+          <div id="regionDetail" class="region-detail">
+            Çalışma bölgesi açıklaması burada gösterilecektir.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BLOK 3 -->
+    <section class="block">
+      <h2>
+        <span class="num">3</span>
+        AC Eş Değer Devre (Alçak Frekans) — Köşe ve Alt Kesim Frekansları
+      </h2>
+
+      <div class="row">
+        <div class="col circuit-col">
+          <svg
+            id="svgAC"
+            viewBox="0 0 560 340"
+            aria-label="Alçak frekans AC eş değer devresi"
+          ></svg>
+        </div>
+
+        <div class="col">
+          <div class="resgrid" id="acResults"></div>
+
+          <p class="note">
+            f<sub>c1</sub>: C1'in köşe frekansı ·
+            f<sub>c2</sub>: C2'nin köşe frekansı ·
+            f<sub>L</sub> = max(f<sub>c1</sub>, f<sub>c2</sub>).
+          </p>
+        </div>
+      </div>
+
+      <div class="frequency-section">
+        <div class="frequency-head">
+          <div>
+            <p class="frequency-kicker">KAZANÇ - FREKANS İNCELEMESİ</p>
+            <h3>Alçak Frekans Tepkisi</h3>
+          </div>
+
+          <div class="frequency-legend">
+            <span class="legend-line"></span>
+            <span>Kazanç eğrisi</span>
+
+            <span class="legend-marker"></span>
+            <span>f<sub>L</sub></span>
+          </div>
+        </div>
+
+        <svg
+          id="svgFrequency"
+          viewBox="0 0 900 360"
+          aria-label="Kazanç frekans tepkisi grafiği"
+        ></svg>
+
+        <p id="frequencyNote" class="frequency-note">
+          Frekans analizi sonucu burada gösterilecektir.
+        </p>
+      </div>
+    </section>
+
+    <!-- BLOK 4 -->
+    <section class="block">
+      <h2>
+        <span class="num">4</span>
+        Test Senaryoları — Hazır Devre Durumları
+      </h2>
+
+      <div class="scenario-intro">
+        <div>
+          <p class="scenario-kicker">TEK TIKLA İNCELEME</p>
+          <p class="scenario-description">
+            Hazır senaryolarla aktif bölge, doyma, kesim ve alçak frekans
+            davranışlarını hızlıca inceleyebilirsin.
+          </p>
+        </div>
+
+        <div id="scenarioStatus" class="scenario-status">
+          Varsayılan aktif bölge senaryosu yüklü.
+        </div>
+      </div>
+
+      <div class="scenario-grid">
+        <button class="scenario-card active" data-scenario="aktif" type="button">
+          <span class="scenario-icon active-icon">A</span>
+          <span class="scenario-content">
+            <strong>Aktif Bölge</strong>
+            <small>Kararlı DC çalışma noktası ve geçerli AC analiz.</small>
+          </span>
+        </button>
+
+        <button class="scenario-card" data-scenario="doyma" type="button">
+          <span class="scenario-icon saturation-icon">D</span>
+          <span class="scenario-content">
+            <strong>Doyma Bölgesi</strong>
+            <small>Kolektör geriliminin yetersiz kaldığı durum.</small>
+          </span>
+        </button>
+
+        <button class="scenario-card" data-scenario="kesim" type="button">
+          <span class="scenario-icon cutoff-icon">K</span>
+          <span class="scenario-content">
+            <strong>Kesim Bölgesi</strong>
+            <small>Emiter akımının oluşmadığı devre durumu.</small>
+          </span>
+        </button>
+
+        <button class="scenario-card" data-scenario="dusukFL" type="button">
+          <span class="scenario-icon frequency-icon">f</span>
+          <span class="scenario-content">
+            <strong>Düşük f<sub>L</sub></strong>
+            <small>Büyük kuplaj kapasitörleri ile düşük alt kesim frekansı.</small>
+          </span>
+        </button>
+      </div>
+    </section>
+
+    <!-- BLOK 5 -->
+    <section class="block">
+      <div class="experiment-head">
+        <div>
+          <h2>
+            <span class="num">5</span>
+            Deney Kayıtları — Parametre ve Sonuç Karşılaştırması
+          </h2>
+
+          <p class="experiment-description">
+            Mevcut devre durumunu kaydedip farklı çalışma bölgelerini ve frekans
+            sonuçlarını tek tabloda karşılaştır.
+          </p>
+        </div>
+
+        <div class="experiment-actions">
+          <button id="saveExperimentBtn" class="primary-btn" type="button">
+            Mevcut Durumu Kaydet
+          </button>
+
+          <button id="clearExperimentsBtn" class="secondary-btn" type="button">
+            Tüm Kayıtları Sil
+          </button>
+        </div>
+      </div>
+
+      <div id="experimentEmpty" class="experiment-empty">
+        Henüz kayıt yok. Parametreleri değiştirip “Mevcut Durumu Kaydet” butonuna bas.
+      </div>
+
+      <div class="experiment-table-wrap">
+        <table class="experiment-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Çalışma Bölgesi</th>
+              <th>VCC</th>
+              <th>|VEE|</th>
+              <th>RC</th>
+              <th>RE</th>
+              <th>IC</th>
+              <th>VCE</th>
+              <th>fL</th>
+              <th>Kazanç</th>
+              <th></th>
+            </tr>
+          </thead>
+
+          <tbody id="experimentTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- BLOK 6 -->
+    <section class="block">
+      <h2>
+        <span class="num">6</span>
+        Sonuç Yorumlama Paneli — Devre Davranışının Teknik Değerlendirmesi
+      </h2>
+
+      <div class="interpretation-head">
+        <div>
+          <p class="interpretation-kicker">OTOMATİK TEKNİK YORUM</p>
+          <p class="interpretation-description">
+            Simülatör, seçilen parametrelere göre devrenin çalışma durumu,
+            kazanç davranışı ve alçak frekans performansı hakkında otomatik yorum üretir.
+          </p>
+        </div>
+
+        <div id="interpretationStatus" class="interpretation-status">
+          Sonuçlar analiz ediliyor...
+        </div>
+      </div>
+
+      <div class="interpretation-grid">
+        <article class="interpretation-card">
+          <div class="interpretation-card-head">
+            <span class="interpretation-icon dc-icon">DC</span>
+            <div>
+              <h3>DC Çalışma Noktası</h3>
+              <p>Transistörün çalışma bölgesi ve akım-gerilim ilişkisi</p>
+            </div>
+          </div>
+
+          <div id="dcInterpretation" class="interpretation-content">
+            DC çalışma noktası yorumu burada gösterilecektir.
+          </div>
+        </article>
+
+        <article class="interpretation-card">
+          <div class="interpretation-card-head">
+            <span class="interpretation-icon gain-icon">A</span>
+            <div>
+              <h3>Kazanç Yorumu</h3>
+              <p>Orta-bant gerilim kazancının değerlendirilmesi</p>
+            </div>
+          </div>
+
+          <div id="gainInterpretation" class="interpretation-content">
+            Kazanç yorumu burada gösterilecektir.
+          </div>
+        </article>
+
+        <article class="interpretation-card">
+          <div class="interpretation-card-head">
+            <span class="interpretation-icon frequency-analysis-icon">f</span>
+            <div>
+              <h3>Frekans Yorumu</h3>
+              <p>C1, C2 ve alt kesim frekansı ilişkisi</p>
+            </div>
+          </div>
+
+          <div id="frequencyInterpretation" class="interpretation-content">
+            Frekans yorumu burada gösterilecektir.
+          </div>
+        </article>
+
+        <article class="interpretation-card">
+          <div class="interpretation-card-head">
+            <span class="interpretation-icon recommendation-icon">!</span>
+            <div>
+              <h3>Tasarım Önerisi</h3>
+              <p>Sonucu iyileştirmek için uygulanabilecek değişiklikler</p>
+            </div>
+          </div>
+
+          <div id="recommendationInterpretation" class="interpretation-content">
+            Tasarım önerisi burada gösterilecektir.
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- BLOK 7 -->
+    <section class="block">
+      <h2>
+        <span class="num">7</span>
+        Analiz Günlüğü — Hesaplama Adımları
+      </h2>
+
+      <div class="analysis-layout">
+        <div class="analysis-intro">
+          <span class="analysis-status">CANLI HESAPLAMA</span>
+
+          <p>
+            Parametre değiştirildiğinde DC çalışma noktası ve alçak frekans
+            analizi aşağıdaki adımlarla yeniden hesaplanır.
+          </p>
+        </div>
+
+        <div class="analysis-log" id="analysisLog">
+          Hesaplama adımları burada gösterilecektir.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
